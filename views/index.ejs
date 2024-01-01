@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title><%= title %></title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/stylish-portfolio.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <style>
+        .center{
+            position:relative;
+            left:50%;
+            width:400px;
+            margin:-150px 0 0 -200px;
+        }
+    </style>
+</head>
+<body>
+    <a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>
+    <nav id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
+            <li class="sidebar-brand">
+                <a href="#top" onclick='$("#menu-close").click();'>JWT Test API v1.0</a>
+            </li>
+            <li>
+                <a href="#a1" onclick='$("#menu-close").click();'>POST /users/create</a>
+            </li>
+            <li>
+                <a href="#a2" onclick='$("#menu-close").click();'>POST /login</a>
+            </li>
+            <li>
+                <a href="#a3" onclick='$("#menu-close").click();'>GET /todolist</a>
+            </li>
+            <li>
+                <a href="#a4" onclick='$("#menu-close").click();'>POST /todolist</a>
+            </li>
+            <li>
+                <a href="#a5" onclick='$("#menu-close").click();'>DELETE /todolist/:id</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <header id="top" class="header">
+        <div class="text-vertical-center" style="text-align: center">
+            <div style="width:400px;" class="center">
+                <h2><%= title %></h1>
+                <h4><%= subtitle %></h3>
+                <div style="text-align: left; margin:20px 50px 20px 50px ">
+                    <ul>
+                        <li>간단한 JWT 백엔드 테스트 API 예제입니다. 내용은 사이드 메뉴를 열어서 확인하세요.</li>
+                        <li>할일목록 앱(Todo List App)을 지원하는 서비스입니다.</li>
+                        <li>테스트용 서비스이므로 할일 데이터는 추가한 후 14일이 지나면 자동 삭제됩니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside  id="a1" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>1. POST /users/create</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 새로운 사용자 등록과 샘플용 todo 3개 등록</p>
+                    <p class="lead">
+                        <div>- POST 파라미터</div>
+                        <ul>
+                            <li>id : 사용자의 식별자로 사용할 userid</li>
+                            <li>username : 사용자의 이름</li>
+                            <li>password : 패스워드</li>
+                        </ul>
+                        <div>- 미리 제공되는 userid/password : gdhong/1234, mrlee/1234</div>
+                        <div>- 요청 형식</div>
+                        <pre>
+{
+    "userid":"gdhong",
+    "username" : "홍길동",
+    "password" : "1234"
+}</pre>
+                        <div>- 응답데이터 형식</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "사용자 생성 성공",
+    "userid": "gdhong"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside  id="a2" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>2. POST /login</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 로그인 처리</p>
+                    <p class="lead">
+                        <div>- POST 파라미터</div>
+                        <ul>
+                            <li>userid : id로 사용하는 email 주소</li>
+                            <li>password : 패스워드</li>
+                        </ul>
+                        <div>- 요청 형식</div>
+                        <pre>
+{
+    "userid":"gdhong",
+    "password" : "1234"
+}</pre>
+                        <div>- 응답데이터 형식</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "로그인 성공",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vyc19pZCI6ImdkaG9uZzJAdGVzdC5jb20iLCJyb2xlIjoidXNlcnMiLCJpYXQiOjE1NzgxMjQxMTEsImV4cCI6MTU3ODcyODkxMX0.YJBMCjkpwReN2DPMFYhvba1CWtGUUF8Kw6p0h2xvmuQ"
+}</pre>
+</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+
+    <aside id="a3" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>3. GET /todolist</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section  class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 사용자의 할일 목록 조회</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                        </ul>
+                        <div>- 응답데이터 형식(성공)</div>
+                        <pre>
+{
+    "status": "success",
+    "todoList": [
+        {
+            "_id": "5e103eef5f0cf40017a61727",
+            "users_id": "gdhong2@test.com",
+            "todo": "ES6 공부",
+            "desc": "ES6공부를 해야 합니다",
+            "done": true
+        },
+        ......
+    ]
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+   "status": "fail",
+   "message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside  id="a4" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>4. GET /todolist/:id</h3>
+            </div>
+        </div>
+    </aside>
+
+<!-- PUT /contacts/:no -->
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 특정한 한건의 todo 정보 조회</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>:id : Todo 한 건의 id</li>
+                        </ul>
+                        <div>- 응답데이터 형식(성공)</div>
+                        <pre>
+{
+    "status": "success",
+    "todo": {
+        "_id": "5e103eef5f0cf40017a61727",
+        "users_id": "gdhong2@test.com",
+        "todo": "ES6 공부",
+        "desc": "ES6공부를 해야 합니다",
+        "done": false
+    }
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+   "status": "fail",
+   "message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside id="a5" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>5. POST /todolist</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 새로운 할일 추가</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>todo : Todo 할일명</li>
+                            <li>desc : 할일에 대한 설명</li>
+                        </ul>
+                        <div>- POST 요청 형식</div>
+                        <pre>
+{
+    "todo":"디자인 시안 작성",
+    "desc" : "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달"
+}</pre>
+                        <div>- 응답데이터 형식(성공)</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "연락처 추가 성공",
+    "todo": {
+        "_id": "5e1046c25f0cf40017a6172c",
+        "users_id": "gdhong@test.com",
+        "todo":"디자인 시안 작성",
+        "desc" : "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달",
+        "done": false
+    }
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+   "status": "fail",
+   "message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside id="a6"  class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>6. PUT /todolist/:id</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 할일 한 건 변경</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>:id : Todo 할일의 id</li>
+                        </ul>
+                        <div>- PUT 요청 형식</div>
+                        <pre>
+{
+    "todo":"디자인 시안 작성(11.10)",
+    "desc" : "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달.-->12.5까지로 변경",
+    "done" : false
+}</pre>
+                        <div>- 응답데이터 형식(성공)</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "할일 업데이트 성공",
+    "_id": "5e103f6f5f0cf40017a6172b"
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+   "status": "fail",
+   "message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    
+    <aside  id="a7" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                <h3>7. DELETE /todolist/:id</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 할일 한건의 삭제</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>:id : Todo 한 건의 id</li>
+                        </ul>
+                        <div>- 응답데이터 형식</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "할일 삭제 성공",
+    "_id": "5e103f6f5f0cf40017a6172b"
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+"status": "fail",
+"message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+
+    <aside  id="a8" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                <h3>8. PUT /todolist/:id/done</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 할일 한건의 완료(done) 값을 toggle 함.</p>
+                    <p class="lead">
+                        <div>- 전달 파라미터</div>
+                        <ul>
+                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>:id : Todo 한 건의 id</li>
+                        </ul>
+                        <div>- 응답데이터 형식</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "할일 완료 처리 성공",
+    "_id": "5e103f6f5f0cf40017a6172b"
+}</pre>
+                        <div>- 응답데이터 형식(실패)</div>
+                        <pre>
+{
+"status": "fail",
+"message": "[에러메시지]"
+}</pre>
+                    </p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside class="call-to-action bg-primary">
+    </aside>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <h4><strong>RESTful Service sample for Apps</strong>
+                    </h4>
+                    <ul class="list-unstyled">
+                        <li><i class="fa fa-envelope-o fa-fw"></i> <a href="mailto:stepanowon@hotmail.com">stepanowon@hotmail.com</a>
+                        </li>
+                    </ul>
+                    <br>
+                    <ul class="list-inline">
+                        <li>
+                            <a href="https://github.com/stepanowon"><i class="fa fa-github fa-fw fa-3x"></i></a>
+                        </li>
+                    </ul>
+                    <hr class="small">
+                    <p class="text-muted">Copyright &copy; Bmaster(Not Amaster)</p>
+                </div>
+            </div>
+        </div>
+        <a id="to-top" href="#top" class="btn btn-dark btn-lg"><i class="fa fa-chevron-up fa-fw fa-1x"></i></a>
+    </footer>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+    $("#menu-close").click(function(e) {
+        e.preventDefault();
+        $("#sidebar-wrapper").toggleClass("active");
+    });
+
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#sidebar-wrapper").toggleClass("active");
+    });
+
+    $(function() {
+        $('a[href*=#]:not([href=#],[data-toggle],[data-target],[data-slide])').click(function() {
+            if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') || location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                if (target.length) {
+                    $('html,body').animate({
+                        scrollTop: target.offset().top
+                    }, 1000);
+                    return false;
+                }
+            }
+        });
+    });
+
+    var fixed = false;
+    $(document).scroll(function() {
+        if ($(this).scrollTop() > 250) {
+            if (!fixed) {
+                fixed = true;
+                // $('#to-top').css({position:'fixed', display:'block'});
+                $('#to-top').show("slow", function() {
+                    $('#to-top').css({
+                        position: 'fixed',
+                        display: 'block'
+                    });
+                });
+            }
+        } else {
+            if (fixed) {
+                fixed = false;
+                $('#to-top').hide("slow", function() {
+                    $('#to-top').css({
+                        display: 'none'
+                    });
+                });
+            }
+        }
+    });
+
+    var onMapMouseleaveHandler = function(event) {
+        var that = $(this);
+        that.on('click', onMapClickHandler);
+        that.off('mouseleave', onMapMouseleaveHandler);
+        that.find('iframe').css("pointer-events", "none");
+    }
+    var onMapClickHandler = function(event) {
+            var that = $(this);
+            that.off('click', onMapClickHandler);
+            that.find('iframe').css("pointer-events", "auto");
+            that.on('mouseleave', onMapMouseleaveHandler);
+        }
+    $('.map').on('click', onMapClickHandler);
+    </script>
+</body>
+</html>
