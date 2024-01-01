@@ -1,5 +1,5 @@
 import { createUser, findUser , getTodoList, addTodo, deleteTodo } from './tododao';
-import { createToken, checkToken, computeHMAC } from './authutil';
+import { createToken, computeHMAC } from './authutil';
 
 export default (app) => { 
 

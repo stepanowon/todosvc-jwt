@@ -122,7 +122,7 @@
                     <p class="lead">
                         <div>- POST 파라미터</div>
                         <ul>
-                            <li>userid : id로 사용하는 email 주소</li>
+                            <li>userid : 사용자 ID</li>
                             <li>password : 패스워드</li>
                         </ul>
                         <div>- 요청 형식</div>
@@ -171,11 +171,10 @@
     "status": "success",
     "todoList": [
         {
-            "_id": "5e103eef5f0cf40017a61727",
-            "users_id": "gdhong2@test.com",
-            "todo": "ES6 공부",
-            "desc": "ES6공부를 해야 합니다",
-            "done": true
+            "userid": "gdhong2",
+            "id": 1704107120576,
+            "todo": "리액트 학습",
+            "desc": "리액트 학습을 해야 합니다"
         },
         ......
     ]
@@ -194,56 +193,10 @@
         <!-- /.container -->
     </section>
 
-    <aside  id="a4" class="call-to-action bg-primary">
+    <aside id="a4" class="call-to-action bg-primary">
         <div class="container">
             <div class="row">
-                    <h3>4. GET /todolist/:id</h3>
-            </div>
-        </div>
-    </aside>
-
-<!-- PUT /contacts/:no -->
-    <section class="about">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-left">
-                    <p>: 특정한 한건의 todo 정보 조회</p>
-                    <p class="lead">
-                        <div>- 전달 파라미터</div>
-                        <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
-                            <li>:id : Todo 한 건의 id</li>
-                        </ul>
-                        <div>- 응답데이터 형식(성공)</div>
-                        <pre>
-{
-    "status": "success",
-    "todo": {
-        "_id": "5e103eef5f0cf40017a61727",
-        "users_id": "gdhong2@test.com",
-        "todo": "ES6 공부",
-        "desc": "ES6공부를 해야 합니다",
-        "done": false
-    }
-}</pre>
-                        <div>- 응답데이터 형식(실패)</div>
-                        <pre>
-{
-   "status": "fail",
-   "message": "[에러메시지]"
-}</pre>
-                    </p>
-                </div>
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container -->
-    </section>
-
-    <aside id="a5" class="call-to-action bg-primary">
-        <div class="container">
-            <div class="row">
-                    <h3>5. POST /todolist</h3>
+                    <h3>4. POST /todolist</h3>
             </div>
         </div>
     </aside>
@@ -270,13 +223,11 @@
                         <pre>
 {
     "status": "success",
-    "message": "연락처 추가 성공",
-    "todo": {
-        "_id": "5e1046c25f0cf40017a6172c",
-        "users_id": "gdhong@test.com",
-        "todo":"디자인 시안 작성",
-        "desc" : "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달",
-        "done": false
+    "message": "추가 성공",
+    "item": {
+        "id": 1704107425337,
+        "todo": "디자인 시안 작성",
+        "desc": "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달"
     }
 }</pre>
                         <div>- 응답데이터 형식(실패)</div>
@@ -293,58 +244,10 @@
         <!-- /.container -->
     </section>
 
-    <aside id="a6"  class="call-to-action bg-primary">
+    <aside  id="a5" class="call-to-action bg-primary">
         <div class="container">
             <div class="row">
-                    <h3>6. PUT /todolist/:id</h3>
-            </div>
-        </div>
-    </aside>
-
-    <section class="about">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-left">
-                    <p>: 할일 한 건 변경</p>
-                    <p class="lead">
-                        <div>- 전달 파라미터</div>
-                        <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
-                            <li>:id : Todo 할일의 id</li>
-                        </ul>
-                        <div>- PUT 요청 형식</div>
-                        <pre>
-{
-    "todo":"디자인 시안 작성(11.10)",
-    "desc" : "12.6까지 제품 디자인 시안 작성하여 개발팀에 전달.-->12.5까지로 변경",
-    "done" : false
-}</pre>
-                        <div>- 응답데이터 형식(성공)</div>
-                        <pre>
-{
-    "status": "success",
-    "message": "할일 업데이트 성공",
-    "_id": "5e103f6f5f0cf40017a6172b"
-}</pre>
-                        <div>- 응답데이터 형식(실패)</div>
-                        <pre>
-{
-   "status": "fail",
-   "message": "[에러메시지]"
-}</pre>
-                    </p>
-                </div>
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container -->
-    </section>
-
-    
-    <aside  id="a7" class="call-to-action bg-primary">
-        <div class="container">
-            <div class="row">
-                <h3>7. DELETE /todolist/:id</h3>
+                <h3>5. DELETE /todolist/:id</h3>
             </div>
         </div>
     </aside>
@@ -364,8 +267,12 @@
                         <pre>
 {
     "status": "success",
-    "message": "할일 삭제 성공",
-    "_id": "5e103f6f5f0cf40017a6172b"
+    "message": "삭제 성공",
+    "item": {
+        "id": 1704103645607,
+        "todo": "리액트 학습",
+        "desc": "리액트 학습을 해야 합니다"
+    }
 }</pre>
                         <div>- 응답데이터 형식(실패)</div>
                         <pre>
@@ -381,46 +288,6 @@
         <!-- /.container -->
     </section>
 
-
-    <aside  id="a8" class="call-to-action bg-primary">
-        <div class="container">
-            <div class="row">
-                <h3>8. PUT /todolist/:id/done</h3>
-            </div>
-        </div>
-    </aside>
-
-    <section class="about">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-left">
-                    <p>: 할일 한건의 완료(done) 값을 toggle 함.</p>
-                    <p class="lead">
-                        <div>- 전달 파라미터</div>
-                        <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
-                            <li>:id : Todo 한 건의 id</li>
-                        </ul>
-                        <div>- 응답데이터 형식</div>
-                        <pre>
-{
-    "status": "success",
-    "message": "할일 완료 처리 성공",
-    "_id": "5e103f6f5f0cf40017a6172b"
-}</pre>
-                        <div>- 응답데이터 형식(실패)</div>
-                        <pre>
-{
-"status": "fail",
-"message": "[에러메시지]"
-}</pre>
-                    </p>
-                </div>
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container -->
-    </section>
 
     <aside class="call-to-action bg-primary">
     </aside>

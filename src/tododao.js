@@ -70,7 +70,7 @@ export const getTodoList = ({ userid }) => {
           delete item.owner;
           result.push(item);
         }
-        return result;
+        return { status: "success", todoList: result };
     } catch (ex) {
         return { status: "fail", message: "조회 실패 : " + ex };
     }
