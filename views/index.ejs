@@ -35,13 +35,16 @@
                 <a href="#a2" onclick='$("#menu-close").click();'>POST /login</a>
             </li>
             <li>
-                <a href="#a3" onclick='$("#menu-close").click();'>GET /todolist</a>
+                <a href="#a3" onclick='$("#menu-close").click();'>POST /token</a>
             </li>
             <li>
-                <a href="#a4" onclick='$("#menu-close").click();'>POST /todolist</a>
+                <a href="#a4" onclick='$("#menu-close").click();'>GET /todolist</a>
             </li>
             <li>
-                <a href="#a5" onclick='$("#menu-close").click();'>DELETE /todolist/:id</a>
+                <a href="#a5" onclick='$("#menu-close").click();'>POST /todolist</a>
+            </li>
+            <li>
+                <a href="#a6" onclick='$("#menu-close").click();'>DELETE /todolist/:id</a>
             </li>
         </ul>
     </nav>
@@ -136,7 +139,8 @@
 {
     "status": "success",
     "message": "로그인 성공",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vyc19pZCI6ImdkaG9uZzJAdGVzdC5jb20iLCJyb2xlIjoidXNlcnMiLCJpYXQiOjE1NzgxMjQxMTEsImV4cCI6MTU3ODcyODkxMX0.YJBMCjkpwReN2DPMFYhvba1CWtGUUF8Kw6p0h2xvmuQ"
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJnZGhvbmc......yNDc1NjR9.xWT490hAzP7JKSo3wYy9Kxxxxxx",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJnZGhvbmcyIiwicm9sZSI6In......Jm5dsDQB_uxxxxxxxxxxbPg1qFPCTPT5Y"
 }</pre>
 </p>
                 </div>
@@ -146,11 +150,49 @@
         <!-- /.container -->
     </section>
 
-
-    <aside id="a3" class="call-to-action bg-primary">
+    <aside  id="a3" class="call-to-action bg-primary">
         <div class="container">
             <div class="row">
-                    <h3>3. GET /todolist</h3>
+                    <h3>3. POST /token</h3>
+            </div>
+        </div>
+    </aside>
+
+    <section class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <p>: 토큰 갱신(refresh token)</p>
+                    <p class="lead">
+                        <div>- POST 파라미터</div>
+                        <ul>
+                            <li>refresh_token : refresh_token</li>
+                        </ul>
+                        <div>- 요청 형식</div>
+                        <pre>
+{
+    "refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJnZGhvbmcyIiwicm9sZ......",
+}</pre>
+                        <div>- 응답데이터 형식</div>
+                        <pre>
+{
+    "status": "success",
+    "message": "토큰 갱신 성공",
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJnZGhvbmc......yNDc1NjR9.xWT490hAzP7JKSo3wYy9Kxxxxxx",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJnZGhvbmcyIiwicm9sZSI6In......Jm5dsDQB_uxxxxxxxxxxbPg1qFPCTPT5Y"
+}</pre>
+</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <aside id="a4" class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                    <h3>4. GET /todolist</h3>
             </div>
         </div>
     </aside>
@@ -163,7 +205,7 @@
                     <p class="lead">
                         <div>- 전달 파라미터</div>
                         <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>access_token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
                         </ul>
                         <div>- 응답데이터 형식(성공)</div>
                         <pre>
@@ -193,10 +235,10 @@
         <!-- /.container -->
     </section>
 
-    <aside id="a4" class="call-to-action bg-primary">
+    <aside id="a5" class="call-to-action bg-primary">
         <div class="container">
             <div class="row">
-                    <h3>4. POST /todolist</h3>
+                    <h3>5. POST /todolist</h3>
             </div>
         </div>
     </aside>
@@ -209,7 +251,7 @@
                     <p class="lead">
                         <div>- 전달 파라미터</div>
                         <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>access_token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
                             <li>todo : Todo 할일명</li>
                             <li>desc : 할일에 대한 설명</li>
                         </ul>
@@ -244,10 +286,10 @@
         <!-- /.container -->
     </section>
 
-    <aside  id="a5" class="call-to-action bg-primary">
+    <aside  id="a6" class="call-to-action bg-primary">
         <div class="container">
             <div class="row">
-                <h3>5. DELETE /todolist/:id</h3>
+                <h3>6. DELETE /todolist/:id</h3>
             </div>
         </div>
     </aside>
@@ -260,7 +302,7 @@
                     <p class="lead">
                         <div>- 전달 파라미터</div>
                         <ul>
-                            <li>Token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
+                            <li>access_token : Authorization 요청 헤더로 전송해야 함. ex) Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.... </li>
                             <li>:id : Todo 한 건의 id</li>
                         </ul>
                         <div>- 응답데이터 형식</div>
