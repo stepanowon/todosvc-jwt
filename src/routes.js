@@ -1,5 +1,5 @@
 import { createUser, findUser , getTodoList, addTodo, deleteTodo } from './tododao';
-import { createToken, computeHMAC } from './authutil';
+import { createToken, computeHMAC, createRefreshToken, checkRefreshToken } from './authutil';
 
 export default (app) => { 
 
@@ -25,11 +25,43 @@ export default (app) => {
         let hashedPassword = computeHMAC(userid, password);
         const doc = findUser({ userid, password:hashedPassword });
         if (doc && doc.status === "success") {
-            let token = createToken({ userid: userid, role:"users" })
-            res.json({ status:"success", message:"로그인 성공", token:token })
+            let access_token = createToken({ userid, role:"users" })
+            let refresh_token = createRefreshToken({ userid, type:"refresh_token", role:"users" })
+            res.json({ status:"success", message:"로그인 성공", access_token, refresh_token })
         } else {
             res.json(doc)
         }
+    })
+
+    app.post('/token', (req, res)=>{
+        console.log("### POST /token")
+        let { refresh_token } = req.body;
+        console.log(refresh_token)
+        if (!refresh_token) {
+            let auth_header = req.headers.authorization;
+            if (auth_header) {
+                let [ name, token ] = auth_header.split(" ")
+                if (typeof(name) === "string" && name === "Bearer") {
+                    refresh_token = token;
+                } else {
+                    res.json({ status:"fail", message:"토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." })
+                }
+            } else {
+                res.json({ status:"fail", message:"authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
+            }
+        } 
+        console.log(refresh_token)
+        
+        checkRefreshToken({ refresh_token, callback: (jwtresult) => {
+            if (jwtresult.status === "success") {
+              let {userid, role, type } = jwtresult.users;
+              let access_token = createToken({ userid, role })
+              let refresh_token = createRefreshToken({ userid, type, role })
+              res.json({ status:"success", message:"토큰 갱신 성공", access_token, refresh_token })
+            } else {
+              res.json(jwtresult);
+            }
+        }})
     })
 
     app.get('/todolist',  (req,res)=> {

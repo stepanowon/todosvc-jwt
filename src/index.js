@@ -9,7 +9,12 @@ import { checkToken } from './authutil'
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:5173','https://testapp.com'],
+    credentials: true
+  })
+);
 
 app.use(function (req, res, next) {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createToken = exports.computeHMAC = exports.checkToken = void 0;
+exports.createToken = exports.createRefreshToken = exports.computeHMAC = exports.checkToken = exports.checkRefreshToken = void 0;
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 var _crypto = require("crypto");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -17,17 +17,66 @@ var createToken = exports.createToken = function createToken(_ref) {
   console.log(userid + ", " + role);
   var token = _jsonwebtoken["default"].sign({
     userid: userid,
-    role: role
+    role: role,
+    iss: "jwt test server"
   }, secretKey, {
     algorithm: "HS256",
-    expiresIn: "14d"
+    expiresIn: "1h"
   });
   return token;
 };
-var checkToken = exports.checkToken = function checkToken(_ref2) {
-  var token = _ref2.token,
-    callback = _ref2.callback;
+var createRefreshToken = exports.createRefreshToken = function createRefreshToken(_ref2) {
+  var userid = _ref2.userid,
+    role = _ref2.role,
+    type = _ref2.type;
+  var token = _jsonwebtoken["default"].sign({
+    userid: userid,
+    role: role,
+    type: type,
+    iss: "jwt test server"
+  }, secretKey, {
+    algorithm: "HS256",
+    expiresIn: "7d"
+  });
+  return token;
+};
+var checkToken = exports.checkToken = function checkToken(_ref3) {
+  var token = _ref3.token,
+    callback = _ref3.callback;
   _jsonwebtoken["default"].verify(token, secretKey, {
+    algorithms: ['HS256']
+  }, function (err, decode) {
+    if (err) {
+      callback({
+        status: "fail",
+        message: err
+      });
+    } else {
+      var exp = new Date(decode.exp * 1000);
+      var now = Date.now();
+      if (exp < now) {
+        callback({
+          status: "fail",
+          message: "expired token"
+        });
+      } else if (decode.type === "refresh_token") {
+        callback({
+          status: "fail",
+          message: "use your valid access_token"
+        });
+      } else {
+        callback({
+          status: "success",
+          users: decode
+        });
+      }
+    }
+  });
+};
+var checkRefreshToken = exports.checkRefreshToken = function checkRefreshToken(_ref4) {
+  var refresh_token = _ref4.refresh_token,
+    callback = _ref4.callback;
+  _jsonwebtoken["default"].verify(refresh_token, secretKey, {
     algorithms: ['HS256']
   }, function (err, decode) {
     if (err) {

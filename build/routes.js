@@ -6,6 +6,12 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _tododao = require("./tododao");
 var _authutil = require("./authutil");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var _default = exports["default"] = function _default(app) {
   app.get('/', function (req, res) {
     console.log("### GET /");
@@ -39,18 +45,80 @@ var _default = exports["default"] = function _default(app) {
       password: hashedPassword
     });
     if (doc && doc.status === "success") {
-      var token = (0, _authutil.createToken)({
+      var access_token = (0, _authutil.createToken)({
         userid: userid,
+        role: "users"
+      });
+      var refresh_token = (0, _authutil.createRefreshToken)({
+        userid: userid,
+        type: "refresh_token",
         role: "users"
       });
       res.json({
         status: "success",
         message: "로그인 성공",
-        token: token
+        access_token: access_token,
+        refresh_token: refresh_token
       });
     } else {
       res.json(doc);
     }
+  });
+  app.post('/token', function (req, res) {
+    console.log("### POST /token");
+    var refresh_token = req.body.refresh_token;
+    console.log(refresh_token);
+    if (!refresh_token) {
+      var auth_header = req.headers.authorization;
+      if (auth_header) {
+        var _auth_header$split = auth_header.split(" "),
+          _auth_header$split2 = _slicedToArray(_auth_header$split, 2),
+          name = _auth_header$split2[0],
+          token = _auth_header$split2[1];
+        if (typeof name === "string" && name === "Bearer") {
+          refresh_token = token;
+        } else {
+          res.json({
+            status: "fail",
+            message: "토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다."
+          });
+        }
+      } else {
+        res.json({
+          status: "fail",
+          message: "authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다."
+        });
+      }
+    }
+    console.log(refresh_token);
+    (0, _authutil.checkRefreshToken)({
+      refresh_token: refresh_token,
+      callback: function callback(jwtresult) {
+        if (jwtresult.status === "success") {
+          var _jwtresult$users = jwtresult.users,
+            userid = _jwtresult$users.userid,
+            role = _jwtresult$users.role,
+            type = _jwtresult$users.type;
+          var access_token = (0, _authutil.createToken)({
+            userid: userid,
+            role: role
+          });
+          var _refresh_token = (0, _authutil.createRefreshToken)({
+            userid: userid,
+            type: type,
+            role: role
+          });
+          res.json({
+            status: "success",
+            message: "토큰 갱신 성공",
+            access_token: access_token,
+            refresh_token: _refresh_token
+          });
+        } else {
+          res.json(jwtresult);
+        }
+      }
+    });
   });
   app.get('/todolist', function (req, res) {
     console.log("### GET /todolist : " + req.users.userid);
