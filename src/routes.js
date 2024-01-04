@@ -27,39 +27,36 @@ export default (app) => {
         if (doc && doc.status === "success") {
             let access_token = createToken({ userid, role:doc.role })
             let refresh_token = createRefreshToken({ userid, type:"refresh_token", role:doc.role })
-            res.json({ status:"success", message:"로그인 성공", access_token, refresh_token })
+            return res.json({ status:"success", message:"로그인 성공", access_token, refresh_token })
         } else {
-            res.json(doc)
+            return res.json(doc)
         }
     })
 
     app.post('/token', (req, res)=>{
         console.log("### POST /token")
         let { refresh_token } = req.body;
+        if (req.cookies["refresh_token"]) {
+            refresh_token = req.cookies["refresh_token"];
+        }
+        console.log(req.cookies);
         if (!refresh_token) {
-            let auth_header = req.headers.authorization;
-            if (auth_header) {
-                let [ name, token ] = auth_header.split(" ")
-                if (typeof(name) === "string" && name === "Bearer") {
-                    refresh_token = token;
+            return res.json({ 
+                status:"fail", 
+                message:"refresh_token이 존재하지 않습니다. Request body 또는 http only cookie로 전달하세요" 
+            })
+        } else {
+            checkRefreshToken({ refresh_token, callback: (jwtresult) => {
+                if (jwtresult.status === "success") {
+                    let {userid, role, type } = jwtresult.users;
+                    let access_token = createToken({ userid, role })
+                    let refresh_token = createRefreshToken({ userid, type, role })
+                    return res.json({ status:"success", message:"토큰 갱신 성공", access_token, refresh_token })
                 } else {
-                    res.json({ status:"fail", message:"토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." })
+                    return res.json(jwtresult);
                 }
-            } else {
-                res.json({ status:"fail", message:"authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
-            }
-        } 
-        
-        checkRefreshToken({ refresh_token, callback: (jwtresult) => {
-            if (jwtresult.status === "success") {
-              let {userid, role, type } = jwtresult.users;
-              let access_token = createToken({ userid, role })
-              let refresh_token = createRefreshToken({ userid, type, role })
-              res.json({ status:"success", message:"토큰 갱신 성공", access_token, refresh_token })
-            } else {
-              res.json(jwtresult);
-            }
-        }})
+            }})
+        }
     })
 
     app.get('/todolist',  (req,res)=> {
