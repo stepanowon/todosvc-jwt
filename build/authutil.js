@@ -14,7 +14,6 @@ if (process.env.JWT_SECRET_KEY) {
 var createToken = exports.createToken = function createToken(_ref) {
   var userid = _ref.userid,
     role = _ref.role;
-  console.log(userid + ", " + role);
   var token = _jsonwebtoken["default"].sign({
     userid: userid,
     role: role,

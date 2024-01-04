@@ -2,6 +2,7 @@
 
 var _express = _interopRequireDefault(require("express"));
 var _bodyParser = _interopRequireDefault(require("body-parser"));
+var _cookieParser = _interopRequireDefault(require("cookie-parser"));
 var _cors = _interopRequireDefault(require("cors"));
 var _morgan = _interopRequireDefault(require("morgan"));
 var _path = _interopRequireDefault(require("path"));
@@ -17,9 +18,10 @@ function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" !=
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var app = (0, _express["default"])();
 app.use((0, _cors["default"])({
-  origin: ['http://localhost:5173', 'https://testapp.com'],
+  origin: ['http://localhost:5173', 'https://testapp.com', 'http://react.test.com:5173'],
   credentials: true
 }));
+app.use((0, _cookieParser["default"])());
 app.use(function (req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   res.header('Expires', '-1');

@@ -23,6 +23,18 @@ var databaseInitialize = function databaseInitialize() {
     });
     //샘플 데이터
     todoList.insert({
+      userid: "admin",
+      id: ++ts,
+      todo: "관리자 업무1",
+      desc: "관리자 업무1을 수행합니다."
+    });
+    todoList.insert({
+      userid: "admin",
+      id: ++ts,
+      todo: "관리자 업무2",
+      desc: "관리자 업무1을 수행합니다."
+    });
+    todoList.insert({
       userid: "gdhong",
       id: ++ts,
       todo: "ES6공부를 해야 합니다",
@@ -53,14 +65,22 @@ var databaseInitialize = function databaseInitialize() {
       indices: ["userid", "password"]
     });
     users.insert({
+      userid: "admin",
+      password: (0, _authutil.computeHMAC)("admin", "1234"),
+      username: "관리자",
+      role: "admins"
+    });
+    users.insert({
       userid: "gdhong",
       password: (0, _authutil.computeHMAC)("gdhong", "1234"),
-      username: "홍길동"
+      username: "홍길동",
+      role: "users"
     });
     users.insert({
       userid: "mrlee",
       password: (0, _authutil.computeHMAC)("mrlee", "1234"),
-      username: "이몽룡"
+      username: "이몽룡",
+      role: "users"
     });
   }
 };
@@ -75,7 +95,6 @@ var db = new _lokijs["default"]('sample.db', {
 var findUser = exports.findUser = function findUser(_ref) {
   var userid = _ref.userid,
     password = _ref.password;
-  console.log(userid + ", " + password);
   try {
     var userOne = users.findOne({
       userid: userid,
@@ -84,7 +103,8 @@ var findUser = exports.findUser = function findUser(_ref) {
     if (userOne) {
       return {
         status: "success",
-        message: "로그인 성공!"
+        message: "로그인 성공!",
+        role: userOne.role
       };
     } else {
       return {
@@ -102,7 +122,9 @@ var findUser = exports.findUser = function findUser(_ref) {
 var createUser = exports.createUser = function createUser(_ref2) {
   var userid = _ref2.userid,
     password = _ref2.password,
-    username = _ref2.username;
+    username = _ref2.username,
+    _ref2$role = _ref2.role,
+    role = _ref2$role === void 0 ? "users" : _ref2$role;
   try {
     var doc = users.findOne({
       userid: userid
@@ -111,7 +133,8 @@ var createUser = exports.createUser = function createUser(_ref2) {
     users.insert({
       userid: userid,
       password: password,
-      username: username
+      username: username,
+      role: role
     });
     //샘플 데이터
     todoList.insert({
