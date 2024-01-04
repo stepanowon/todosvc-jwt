@@ -1,5 +1,5 @@
 {
-  "name": "backend-auth",
+  "name": "todosvc-jwt",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
