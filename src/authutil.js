@@ -7,7 +7,6 @@ if (process.env.JWT_SECRET_KEY) {
 }
 
 const createToken = ({ userid, role }) => {
-    console.log(userid + ", "+role)
     let token = jwt.sign({
         userid, role, iss:"jwt test server" 
     }, secretKey, {

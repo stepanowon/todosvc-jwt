@@ -25,8 +25,8 @@ export default (app) => {
         let hashedPassword = computeHMAC(userid, password);
         const doc = findUser({ userid, password:hashedPassword });
         if (doc && doc.status === "success") {
-            let access_token = createToken({ userid, role:"users" })
-            let refresh_token = createRefreshToken({ userid, type:"refresh_token", role:"users" })
+            let access_token = createToken({ userid, role:doc.role })
+            let refresh_token = createRefreshToken({ userid, type:"refresh_token", role:doc.role })
             res.json({ status:"success", message:"로그인 성공", access_token, refresh_token })
         } else {
             res.json(doc)
@@ -36,7 +36,6 @@ export default (app) => {
     app.post('/token', (req, res)=>{
         console.log("### POST /token")
         let { refresh_token } = req.body;
-        console.log(refresh_token)
         if (!refresh_token) {
             let auth_header = req.headers.authorization;
             if (auth_header) {
@@ -50,7 +49,6 @@ export default (app) => {
                 res.json({ status:"fail", message:"authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
             }
         } 
-        console.log(refresh_token)
         
         checkRefreshToken({ refresh_token, callback: (jwtresult) => {
             if (jwtresult.status === "success") {

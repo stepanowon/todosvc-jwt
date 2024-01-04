@@ -9,6 +9,8 @@ let databaseInitialize= () => {
     if (todoList === null) {
         todoList = db.addCollection('todoList', { indices: ['userid','id'] });
         //샘플 데이터
+        todoList.insert({ userid: "admin", id: ++ts, todo: "관리자 업무1", desc:"관리자 업무1을 수행합니다." });
+        todoList.insert({ userid: "admin", id: ++ts, todo: "관리자 업무2", desc:"관리자 업무1을 수행합니다." });
         todoList.insert({ userid: "gdhong", id: ++ts, todo: "ES6공부를 해야 합니다", desc:"설명1" });
         todoList.insert({ userid: "gdhong", id: ++ts, todo: "리액트 학습", desc:"리액트 학습을 해야 합니다" }, );
         todoList.insert({ userid: "mrlee", id: ++ts, todo: "남원구경", desc:"고향집에 가봐야합니다." });
@@ -17,8 +19,9 @@ let databaseInitialize= () => {
     users = db.getCollection("users");
     if (users === null) {
         users = db.addCollection("users", { indices: ["userid","password"] });
-        users.insert({ userid: "gdhong", password:computeHMAC("gdhong","1234"), username:"홍길동" });
-        users.insert({ userid: "mrlee", password:computeHMAC("mrlee","1234"), username:"이몽룡" });
+        users.insert({ userid: "admin", password:computeHMAC("admin","1234"), username:"관리자", role:"admins" });
+        users.insert({ userid: "gdhong", password:computeHMAC("gdhong","1234"), username:"홍길동", role:"users" });
+        users.insert({ userid: "mrlee", password:computeHMAC("mrlee","1234"), username:"이몽룡", role:"users" });
     }
 }
 
@@ -31,11 +34,10 @@ var db = new loki('sample.db', {
 });
 
 export const findUser = ({ userid, password}) => {
-    console.log(userid + ", " + password)
     try {
         let userOne = users.findOne({ userid, password });
         if (userOne) {
-            return { status: "success", message: "로그인 성공!" };
+            return { status: "success", message: "로그인 성공!", role: userOne.role };
         } else {
             return { status: "fail", message: "로그인 실패 : 사용자, 암호를 확인하세요" };
         }
@@ -44,11 +46,11 @@ export const findUser = ({ userid, password}) => {
     }
 } 
 
-export const createUser = ({ userid, password, username }) => {
+export const createUser = ({ userid, password, username, role="users" }) => {
     try {
         let doc = users.findOne({ userid })
         if (doc)  throw new Error("이미 존재하는 사용자입니다.");
-        users.insert({ userid, password, username });
+        users.insert({ userid, password, username, role });
         //샘플 데이터
         todoList.insert({ userid, id: new Date().getTime(), todo: "ES6공부를 해야 합니다", desc:"리액트 학습을 위해 ES6를 익혀야 합니다." });
         todoList.insert({ userid, id: new Date().getTime()+1, todo: "리액트 학습", desc:"리액트 학습을 해야 합니다" }, );
