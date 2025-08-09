@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.createToken = exports.createRefreshToken = exports.computeHMAC = exports.checkToken = exports.checkRefreshToken = void 0;
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 var _crypto = require("crypto");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 var secretKey = "mysecretkey";
 if (process.env.JWT_SECRET_KEY) {
   secretKey = process.env.JWT_SECRET_KEY;
