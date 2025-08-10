@@ -329,11 +329,3 @@ CMD ["npm", "start"]
 ## 📝 라이선스  
 MIT License  
 
-## 📞 연락처
-
-- **개발자**: stepanowon@hotmail.com
-- **GitHub**: [@stepanowon](https://github.com/stepanowon)
-
----
-
-⭐ 이 프로젝트가 도움이 되셨다면 스타를 눌러주세요!
