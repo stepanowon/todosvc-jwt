@@ -326,9 +326,8 @@ CMD ["npm", "start"]
 4. 브랜치에 푸시 (`git push origin feature/amazing-feature`)
 5. Pull Request 생성
 
-## 📝 라이선스
-
-이 프로젝트는 ISC 라이선스 하에 배포됩니다.
+## 📝 라이선스  
+MIT License  
 
 ## 📞 연락처
 
