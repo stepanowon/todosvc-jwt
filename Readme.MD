@@ -1,34 +1,38 @@
 # TodoSvc-JWT
 
-JWT 인증을 적용한 할일 관리 REST API 서비스
+JWT 인증을 적용한 할일 관리 REST API 서비스 (TypeScript)
 
 ## 소개
 
-Node.js + Express 기반으로 사용자 등록/로그인/JWT 인증(Access + Refresh Token)과 할일(Todo) CRUD를 제공하는 예제 서비스입니다. 데이터는 파일 기반 인메모리 DB인 LokiJS(`sample.db`)에 저장됩니다.
+Express 기반으로 사용자 등록/로그인/JWT 인증(Access + Refresh Token)과 할일(Todo) CRUD를 제공하는 예제 서비스입니다. 데이터는 파일 기반 인메모리 DB인 LokiJS(`sample.db`)에 저장됩니다.
 
 ## 기술 스택
 
+- **TypeScript** — 전체 소스 (`src/**/*.ts`)
 - **Express** 5
 - **jose** — JWT 서명/검증 (HS512)
-- **body-parser** 2
-- **cookie-parser**, **cors**, **morgan**, **rotating-file-stream**
+- **body-parser** 2, **cookie-parser**, **cors**, **morgan**, **rotating-file-stream**
 - **LokiJS** — 인메모리/파일 DB
 - **EJS** — 템플릿 엔진 (테스트용 웹 페이지)
-- **Babel** 7 — ES6+ 트랜스파일
+- **tsx** — 개발 서버 실행기
+- **tsc** — 빌드(타입체크 + 트랜스파일)
 
 ## 프로젝트 구조
 
 ```
 todosvc-jwt/
 ├── src/
-│   ├── index.js      # 서버 설정, 미들웨어, JWT 인증 검사
-│   ├── routes.js      # API 라우트
-│   ├── authutil.js    # JWT 발급/검증, 비밀번호 해시
-│   └── tododao.js     # LokiJS 데이터 접근 계층
-├── views/              # EJS 템플릿
-├── public/             # 정적 파일
-├── log/                # 접근 로그 (자동 생성)
-└── build/              # 빌드 결과물 (babel 컴파일)
+│   ├── index.ts       # 서버 설정, 미들웨어, JWT 인증 검사
+│   ├── routes.ts       # API 라우트
+│   ├── authutil.ts     # JWT 발급/검증, 비밀번호 해시
+│   ├── tododao.ts      # LokiJS 데이터 접근 계층
+│   ├── types.ts        # 공용 타입 정의
+│   └── express.d.ts     # Express Request 타입 확장
+├── views/               # EJS 템플릿
+├── public/              # 정적 파일
+├── log/                 # 접근 로그 (자동 생성)
+├── build/               # 빌드 결과물 (tsc 컴파일)
+└── tsconfig.json
 ```
 
 ## 설치 및 실행
@@ -36,11 +40,13 @@ todosvc-jwt/
 ```bash
 npm install
 
-# 개발 모드 (nodemon + babel-node)
+# 개발 모드 (tsx + nodemon, 파일 변경 시 자동 재시작)
 npm run dev
 
-# 프로덕션 빌드 후 실행
-npm run build
+# 타입 체크만
+npm run typecheck
+
+# 빌드 후 실행 (build는 clean + tsc를 포함)
 npm start
 ```
 

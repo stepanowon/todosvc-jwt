@@ -1,18 +1,19 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
+import * as rfs from 'rotating-file-stream';
 import routes from './routes';
-import { checkToken } from './authutil'
+import { checkToken } from './authutil';
 
 const app = express();
 
 app.use(
   cors({
-    origin: ['http://localhost:5173','https://testapp.com', 'http://react.test.com:5173'],
+    origin: ['http://localhost:5173', 'https://testapp.com', 'http://react.test.com:5173'],
     credentials: true
   })
 );
@@ -20,7 +21,7 @@ app.use(
 app.use(cookieParser());
 
 // Cache-Control 헤더 설정 (중복 제거)
-app.use(function (req, res, next) {
+app.use(function (req: Request, res: Response, next: NextFunction) {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     res.header('Expires', '-1');
     res.header('Pragma', 'no-cache');
@@ -28,9 +29,8 @@ app.use(function (req, res, next) {
 });
 
 //-- 로깅
-var baseDir = path.resolve('.');
+const baseDir = path.resolve('.');
 
-const rfs = require("rotating-file-stream");
 const logDirectory = path.join(baseDir, '/log')
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 const accessLogStream = rfs.createStream("access.log", {
@@ -39,7 +39,7 @@ const accessLogStream = rfs.createStream("access.log", {
   path: logDirectory
 });
 
-app.use(morgan('combined', {stream: accessLogStream}))
+app.use(morgan('combined', { stream: accessLogStream }))
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -54,16 +54,16 @@ app.use(bodyParser.urlencoded({
 }));
 
 //권한 검증용 MW
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   if (!req.path.startsWith('/todolist') && !req.path.startsWith('/todolist_long')) {
     next();
     return;
-  } 
+  }
   //console.log("## JWT Middleware!! : " + req.path)
   let auth_header = req.headers.authorization;
   if (auth_header) {
-      let [ name, token ] = auth_header.split(" ")
-      if (typeof(name) === "string" && name === "Bearer") {
+      let [name, token] = auth_header.split(" ")
+      if (typeof (name) === "string" && name === "Bearer") {
         checkToken({ token, callback: (jwtresult) => {
           if (jwtresult.status === "success") {
             req.users = jwtresult.users;
@@ -73,16 +73,16 @@ app.use((req, res, next) => {
           }
         }})
       } else {
-        res.json({ status:"fail", message:"토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." })
+        res.json({ status: "fail", message: "토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." })
       }
   } else {
-      res.json({ status:"fail", message:"authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
+      res.json({ status: "fail", message: "authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
   }
 
 });
 
 routes(app);
 
-const server = app.listen(app.get('port'), function() {
+app.listen(app.get('port'), function () {
     console.log("할일 목록 서비스가 " + app.get('port') + "번 포트에서 시작되었습니다!");
 });
