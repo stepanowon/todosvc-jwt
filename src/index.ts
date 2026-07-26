@@ -6,8 +6,10 @@ import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
 import * as rfs from 'rotating-file-stream';
+import swaggerUi from 'swagger-ui-express';
 import routes from './routes';
 import { checkToken } from './authutil';
+import { swaggerSpec } from './swagger';
 
 const app = express();
 
@@ -57,6 +59,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //권한 검증용 MW
 app.use((req: Request, res: Response, next: NextFunction) => {

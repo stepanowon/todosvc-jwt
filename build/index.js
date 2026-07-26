@@ -44,8 +44,10 @@ const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const rfs = __importStar(require("rotating-file-stream"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const routes_1 = __importDefault(require("./routes"));
 const authutil_1 = require("./authutil");
+const swagger_1 = require("./swagger");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: ['http://localhost:5173', 'https://testapp.com', 'http://react.test.com:5173'],
@@ -84,6 +86,7 @@ app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({
     extended: true
 }));
+app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
 //권한 검증용 MW
 app.use((req, res, next) => {
     if (!req.path.startsWith('/todolist') && !req.path.startsWith('/todolist_long')) {
