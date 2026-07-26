@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTodo = exports.addTodo = exports.getTodoList = exports.createUser = exports.findUser = void 0;
 const lokijs_1 = __importDefault(require("lokijs"));
+const os_1 = __importDefault(require("os"));
+const path_1 = __importDefault(require("path"));
 const authutil_1 = require("./authutil");
 let ts = new Date().getTime();
 let todoList;
@@ -29,7 +31,10 @@ const databaseInitialize = () => {
         users.insert({ userid: "mrlee", password: (0, authutil_1.computeHMAC)("mrlee", "1234"), username: "이몽룡", role: "users" });
     }
 };
-const db = new lokijs_1.default('sample.db', {
+// Vercel 등 서버리스 환경은 파일시스템이 읽기 전용이므로 쓰기 가능한 /tmp에 저장한다.
+// (단, /tmp는 콜드 스타트마다 초기화되어 데이터가 영구 보존되지는 않는다.)
+const dbPath = process.env.VERCEL ? path_1.default.join(os_1.default.tmpdir(), 'sample.db') : 'sample.db';
+const db = new lokijs_1.default(dbPath, {
     autoload: true,
     autoloadCallback: databaseInitialize,
     autosave: true,

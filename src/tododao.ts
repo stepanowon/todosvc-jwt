@@ -1,4 +1,6 @@
 import loki, { Collection } from 'lokijs';
+import os from 'os';
+import path from 'path';
 import { computeHMAC } from './authutil';
 import type { TodoItem, UserRecord, ApiResult } from './types';
 
@@ -27,7 +29,11 @@ const databaseInitialize = () => {
     }
 }
 
-const db = new loki('sample.db', {
+// Vercel 등 서버리스 환경은 파일시스템이 읽기 전용이므로 쓰기 가능한 /tmp에 저장한다.
+// (단, /tmp는 콜드 스타트마다 초기화되어 데이터가 영구 보존되지는 않는다.)
+const dbPath = process.env.VERCEL ? path.join(os.tmpdir(), 'sample.db') : 'sample.db';
+
+const db = new loki(dbPath, {
     autoload: true,
     autoloadCallback: databaseInitialize,
     autosave: true,

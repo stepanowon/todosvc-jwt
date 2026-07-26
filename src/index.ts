@@ -31,13 +31,18 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
 //-- 로깅
 const baseDir = path.resolve('.');
 
-const logDirectory = path.join(baseDir, '/log')
-fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
-const accessLogStream = rfs.createStream("access.log", {
-  size: "10M",
-  interval: "1d",
-  path: logDirectory
-});
+// Vercel 등 서버리스 환경은 파일시스템이 읽기 전용이라 로그 파일을 만들 수 없다.
+// 이런 환경에서는 stdout으로 로그를 보내고(플랫폼이 수집), 그 외에는 기존처럼 파일로 로테이션한다.
+let accessLogStream: NodeJS.WritableStream = process.stdout;
+if (!process.env.VERCEL) {
+  const logDirectory = path.join(baseDir, '/log')
+  fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+  accessLogStream = rfs.createStream("access.log", {
+    size: "10M",
+    interval: "1d",
+    path: logDirectory
+  });
+}
 
 app.use(morgan('combined', { stream: accessLogStream }))
 
