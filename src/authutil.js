@@ -1,62 +1,45 @@
-import jwt from 'jsonwebtoken'
+import { SignJWT, jwtVerify } from 'jose'
 import { createHash } from 'crypto'
 
 let secretKey = "mysecretkey";
 if (process.env.JWT_SECRET_KEY) {
     secretKey = process.env.JWT_SECRET_KEY;
 }
+const secret = new TextEncoder().encode(secretKey);
 
 const createToken = ({ userid, role }) => {
-    let token = jwt.sign({
-        userid, role, iss:"jwt test server" 
-    }, secretKey, {
-        algorithm : "HS256",
-        expiresIn:"1h",
-    })
-    return token;
+    return new SignJWT({ userid, role, iss:"jwt test server" })
+        .setProtectedHeader({ alg: "HS512", typ: "JWT" })
+        .setIssuedAt()
+        .setExpirationTime("1h")
+        .sign(secret)
 }
 
 const createRefreshToken = ({ userid, role, type }) => {
-    let token = jwt.sign({
-        userid, role, type, iss:"jwt test server" 
-    }, secretKey, {
-        algorithm : "HS256",
-        expiresIn:"7d",
-    })
-    return token;
+    return new SignJWT({ userid, role, type, iss:"jwt test server" })
+        .setProtectedHeader({ alg: "HS512", typ: "JWT" })
+        .setIssuedAt()
+        .setExpirationTime("7d")
+        .sign(secret)
 }
 
 const checkToken = ({ token, callback }) => {
-    jwt.verify(token, secretKey, { algorithms: ['HS256'] }, (err, decode) => { 
-        if (err) {
-            callback({status: "fail", message:err })
+    jwtVerify(token, secret, { algorithms: ['HS512'] }).then(({ payload }) => {
+        if (payload.type === "refresh_token") {
+            callback({ status:"fail", message: "use your valid access_token" })
         } else {
-            const exp = new Date(decode.exp * 1000)
-            const now = Date.now()
-            if (exp < now) {
-                callback({ status:"fail", message: "expired token" })
-            } else if (decode.type === "refresh_token") {
-                callback({ status:"fail", message: "use your valid access_token" })
-            } else {
-                callback({ status:"success", users: decode})
-            }
+            callback({ status:"success", users: payload })
         }
+    }).catch((err) => {
+        callback({ status:"fail", message: err.code === "ERR_JWT_EXPIRED" ? "expired token" : err })
     })
 }
 
 const checkRefreshToken = ({ refresh_token, callback }) => {
-    jwt.verify(refresh_token, secretKey, { algorithms: ['HS256'] }, (err, decode) => { 
-        if (err) {
-            callback({status: "fail", message:err })
-        } else {
-            const exp = new Date(decode.exp * 1000)
-            const now = Date.now()
-            if (exp < now) {
-              callback({ status:"fail", message: "expired token" })
-            } else {
-              callback({ status:"success", users: decode})
-            }
-        }
+    jwtVerify(refresh_token, secret, { algorithms: ['HS512'] }).then(({ payload }) => {
+        callback({ status:"success", users: payload })
+    }).catch((err) => {
+        callback({ status:"fail", message: err.code === "ERR_JWT_EXPIRED" ? "expired token" : err })
     })
 }
 

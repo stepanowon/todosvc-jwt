@@ -19,14 +19,14 @@ export default (app) => {
         res.json(result);
     })
 
-    app.post('/login', (req,res)=> {
+    app.post('/login', async (req,res)=> {
         console.log("### POST /login")
         let { userid, password } = req.body;
         let hashedPassword = computeHMAC(userid, password);
         const doc = findUser({ userid, password:hashedPassword });
         if (doc && doc.status === "success") {
-            let access_token = createToken({ userid, role:doc.role })
-            let refresh_token = createRefreshToken({ userid, type:"refresh_token", role:doc.role })
+            let access_token = await createToken({ userid, role:doc.role })
+            let refresh_token = await createRefreshToken({ userid, type:"refresh_token", role:doc.role })
             return res.json({ status:"success", message:"로그인 성공", access_token, refresh_token })
         } else {
             return res.json(doc)
@@ -41,16 +41,16 @@ export default (app) => {
         }
         console.log(req.cookies);
         if (!refresh_token) {
-            return res.json({ 
-                status:"fail", 
-                message:"refresh_token이 존재하지 않습니다. Request body 또는 http only cookie로 전달하세요" 
+            return res.json({
+                status:"fail",
+                message:"refresh_token이 존재하지 않습니다. Request body 또는 http only cookie로 전달하세요"
             })
         } else {
-            checkRefreshToken({ refresh_token, callback: (jwtresult) => {
+            checkRefreshToken({ refresh_token, callback: async (jwtresult) => {
                 if (jwtresult.status === "success") {
                     let {userid, role, type } = jwtresult.users;
-                    let access_token = createToken({ userid, role })
-                    let refresh_token = createRefreshToken({ userid, type, role })
+                    let access_token = await createToken({ userid, role })
+                    let refresh_token = await createRefreshToken({ userid, type, role })
                     return res.json({ status:"success", message:"토큰 갱신 성공", access_token, refresh_token })
                 } else {
                     return res.json(jwtresult);
@@ -83,7 +83,7 @@ export default (app) => {
     })
     
     //----에러 처리 시작
-    app.get('*', (req, res, next) => {
+    app.get('/*splat', (req, res, next) => {
         var err = new Error();
         err.status = 404;
         next(err);
