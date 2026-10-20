@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tododao_1 = require("./tododao");
 const authutil_1 = require("./authutil");
+const authmiddleware_1 = require("./authmiddleware");
 //DAO 결과의 code를 HTTP Status Code로 사용하고, body에서는 제외한다
 const sendResult = (res, result) => {
     const { code, ...body } = result;
@@ -70,20 +71,20 @@ exports.default = (app) => {
                 } });
         }
     });
-    app.get('/todolist', (req, res) => {
+    app.get('/todolist', authmiddleware_1.authenticate, (req, res) => {
         console.log("### GET /todolist : " + req.users.userid);
         let userid = req.users.userid;
         let response = (0, tododao_1.getTodoList)({ userid });
         sendResult(res, response);
     });
-    app.post('/todolist', (req, res) => {
+    app.post('/todolist', authmiddleware_1.authenticate, (req, res) => {
         console.log("### POST /todolist : " + req.users.userid);
         let userid = req.users.userid;
         let { todo, desc } = req.body ?? {};
         let response = (0, tododao_1.addTodo)({ userid, todo, desc });
         sendResult(res, response);
     });
-    app.delete('/todolist/:id', (req, res) => {
+    app.delete('/todolist/:id', authmiddleware_1.authenticate, (req, res) => {
         console.log("### DELETE /todolist/:id : " + req.users.userid);
         let userid = req.users.userid;
         if (!/^\d+$/.test(req.params.id)) {

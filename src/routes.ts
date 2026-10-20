@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from 'express';
 import { createUser, findUser, getTodoList, addTodo, deleteTodo } from './tododao';
 import type { ApiResult } from './types';
 import { createToken, computeHMAC, createRefreshToken, checkRefreshToken } from './authutil';
+import { authenticate } from './authmiddleware';
 
 interface HttpError extends Error {
     status?: number;
@@ -79,14 +80,14 @@ export default (app: Express) => {
         }
     })
 
-    app.get('/todolist', (req: Request, res: Response) => {
+    app.get('/todolist', authenticate, (req: Request, res: Response) => {
         console.log("### GET /todolist : " + req.users!.userid);
         let userid = req.users!.userid;
         let response = getTodoList({ userid });
         sendResult(res, response);
     })
 
-    app.post('/todolist', (req: Request, res: Response) => {
+    app.post('/todolist', authenticate, (req: Request, res: Response) => {
         console.log("### POST /todolist : " + req.users!.userid);
         let userid = req.users!.userid;
         let { todo, desc } = req.body ?? {};
@@ -94,7 +95,7 @@ export default (app: Express) => {
         sendResult(res, response);
     })
 
-    app.delete('/todolist/:id', (req: Request, res: Response) => {
+    app.delete('/todolist/:id', authenticate, (req: Request, res: Response) => {
         console.log("### DELETE /todolist/:id : " + req.users!.userid);
         let userid = req.users!.userid;
         if (!/^\d+$/.test(req.params.id as string)) {

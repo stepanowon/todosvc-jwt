@@ -22,9 +22,10 @@ Express 기반으로 사용자 등록/로그인/JWT 인증(Access + Refresh Toke
 ```
 todosvc-jwt/
 ├── src/
-│   ├── index.ts       # 서버 설정, 미들웨어, JWT 인증 검사
+│   ├── index.ts       # 서버 설정, 공통 미들웨어
 │   ├── config.ts      # 환경변수(.env) 로드, JWT 설정
 │   ├── routes.ts       # API 라우트
+│   ├── authmiddleware.ts # 인증(authenticate)/인가(requireRole) 미들웨어
 │   ├── authutil.ts     # JWT 발급/검증, 비밀번호 해시
 │   ├── tododao.ts      # LokiJS 데이터 접근 계층
 │   ├── types.ts        # 공용 타입 정의
@@ -123,6 +124,18 @@ cp .env.example .env
 - Refresh Token: 7일 만료 (`JWT_REFRESH_TOKEN_EXPIRES_IN`으로 변경), HTTP-only 쿠키 또는 요청 body로 전달 가능
 - `/token`은 refresh_token만 허용하며, access_token으로는 토큰을 재발급할 수 없습니다
 - 비밀번호는 SHA-256 HMAC으로 해시하여 저장
+
+### 인증/인가 미들웨어
+
+`src/authmiddleware.ts`의 미들웨어를 보호할 라우트에 직접 지정합니다.
+
+- `authenticate` — `Authorization: Bearer <access_token>`을 검증하고 토큰 정보를 `req.users`에 설정합니다. 실패하면 401로 응답합니다.
+- `requireRole(...roles)` — `req.users.role`이 허용된 role이 아니면 403으로 응답합니다. `authenticate` 다음에 지정합니다.
+
+```ts
+app.get('/todolist', authenticate, handler);
+app.delete('/admin/users/:id', authenticate, requireRole('admins'), handler);
+```
 
 서명 키는 `JWT_SECRET_KEY` 환경변수로 지정합니다. 지정하지 않으면 개발용 기본값을 사용하므로 운영 환경에서는 반드시 설정해야 합니다.
 

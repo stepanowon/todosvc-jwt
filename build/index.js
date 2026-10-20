@@ -48,7 +48,6 @@ const fs_1 = __importDefault(require("fs"));
 const rfs = __importStar(require("rotating-file-stream"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const routes_1 = __importDefault(require("./routes"));
-const authutil_1 = require("./authutil");
 const swagger_1 = require("./swagger");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
@@ -89,39 +88,6 @@ app.use(body_parser_1.default.urlencoded({
     extended: true
 }));
 app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
-//권한 검증용 MW
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/todolist') && !req.path.startsWith('/todolist_long')) {
-        next();
-        return;
-    }
-    //console.log("## JWT Middleware!! : " + req.path)
-    //인증 실패는 모두 401 + WWW-Authenticate 헤더로 응답한다 (RFC 6750)
-    const unauthorized = (body, error = "invalid_token") => {
-        res.status(401).set('WWW-Authenticate', `Bearer realm="todosvc", error="${error}"`).json(body);
-    };
-    let auth_header = req.headers.authorization;
-    if (auth_header) {
-        let [name, token] = auth_header.split(" ");
-        if (typeof (name) === "string" && name === "Bearer") {
-            (0, authutil_1.checkToken)({ token, callback: (jwtresult) => {
-                    if (jwtresult.status === "success") {
-                        req.users = jwtresult.users;
-                        next();
-                    }
-                    else {
-                        unauthorized(jwtresult);
-                    }
-                } });
-        }
-        else {
-            unauthorized({ status: "fail", message: "토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." }, "invalid_request");
-        }
-    }
-    else {
-        unauthorized({ status: "fail", message: "authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." }, "invalid_request");
-    }
-});
 (0, routes_1.default)(app);
 app.listen(app.get('port'), function () {
     console.log("할일 목록 서비스가 " + app.get('port') + "번 포트에서 시작되었습니다!");
