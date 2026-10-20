@@ -2,6 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tododao_1 = require("./tododao");
 const authutil_1 = require("./authutil");
+//DAO 결과의 code를 HTTP Status Code로 사용하고, body에서는 제외한다
+const sendResult = (res, result) => {
+    const { code, ...body } = result;
+    return res.status(code ?? (result.status === "success" ? 200 : 500)).json(body);
+};
+const isBlank = (value) => typeof value !== "string" || value.trim() === "";
 exports.default = (app) => {
     app.get('/', (req, res) => {
         console.log("### GET /");
@@ -12,14 +18,20 @@ exports.default = (app) => {
     });
     app.post('/users/create', (req, res) => {
         console.log("### POST /users/create");
-        let { userid, password, username } = req.body;
+        let { userid, password, username } = req.body ?? {};
+        if (isBlank(userid) || isBlank(password) || isBlank(username)) {
+            return res.status(400).json({ status: "fail", message: "사용자 등록 실패 : userid, password, username을 모두 입력하세요" });
+        }
         let hashedPassword = (0, authutil_1.computeHMAC)(userid, password);
         const result = (0, tododao_1.createUser)({ userid, username, password: hashedPassword });
-        res.json(result);
+        sendResult(res, result);
     });
     app.post('/login', async (req, res) => {
         console.log("### POST /login");
-        let { userid, password } = req.body;
+        let { userid, password } = req.body ?? {};
+        if (isBlank(userid) || isBlank(password)) {
+            return res.status(400).json({ status: "fail", message: "로그인 실패 : userid, password를 입력하세요" });
+        }
         let hashedPassword = (0, authutil_1.computeHMAC)(userid, password);
         const doc = (0, tododao_1.findUser)({ userid, password: hashedPassword });
         if (doc && doc.status === "success") {
@@ -28,18 +40,18 @@ exports.default = (app) => {
             return res.json({ status: "success", message: "로그인 성공", access_token, refresh_token });
         }
         else {
-            return res.json(doc);
+            return sendResult(res, doc);
         }
     });
     app.post('/token', (req, res) => {
         console.log("### POST /token");
-        let { refresh_token } = req.body;
+        let { refresh_token } = req.body ?? {};
         if (req.cookies["refresh_token"]) {
             refresh_token = req.cookies["refresh_token"];
         }
         console.log(req.cookies);
         if (!refresh_token) {
-            return res.json({
+            return res.status(400).json({
                 status: "fail",
                 message: "refresh_token이 존재하지 않습니다. Request body 또는 http only cookie로 전달하세요"
             });
@@ -53,7 +65,7 @@ exports.default = (app) => {
                         return res.json({ status: "success", message: "토큰 갱신 성공", access_token, refresh_token });
                     }
                     else {
-                        return res.json(jwtresult);
+                        return res.status(401).json(jwtresult);
                     }
                 } });
         }
@@ -62,24 +74,28 @@ exports.default = (app) => {
         console.log("### GET /todolist : " + req.users.userid);
         let userid = req.users.userid;
         let response = (0, tododao_1.getTodoList)({ userid });
-        res.json(response);
+        sendResult(res, response);
     });
     app.post('/todolist', (req, res) => {
         console.log("### POST /todolist : " + req.users.userid);
         let userid = req.users.userid;
-        let { todo, desc } = req.body;
+        let { todo, desc } = req.body ?? {};
         let response = (0, tododao_1.addTodo)({ userid, todo, desc });
-        res.json(response);
+        sendResult(res, response);
     });
     app.delete('/todolist/:id', (req, res) => {
-        console.log("### PUT /todolist/:id : " + req.users.userid);
+        console.log("### DELETE /todolist/:id : " + req.users.userid);
         let userid = req.users.userid;
+        if (!/^\d+$/.test(req.params.id)) {
+            return res.status(400).json({ status: "fail", message: "삭제 실패 : id는 정수여야 합니다" });
+        }
         let id = parseInt(req.params.id, 10);
         let response = (0, tododao_1.deleteTodo)({ userid, id });
-        res.json(response);
+        sendResult(res, response);
     });
     //----에러 처리 시작
-    app.get('/*splat', (req, res, next) => {
+    //GET 외의 메서드로 들어온 잘못된 URI 요청도 JSON 404로 응답한다
+    app.use((req, res, next) => {
         const err = new Error();
         err.status = 404;
         next(err);

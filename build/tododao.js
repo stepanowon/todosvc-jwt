@@ -47,11 +47,11 @@ const findUser = ({ userid, password }) => {
             return { status: "success", message: "로그인 성공!", role: userOne.role };
         }
         else {
-            return { status: "fail", message: "로그인 실패 : 사용자, 암호를 확인하세요" };
+            return { status: "fail", code: 401, message: "로그인 실패 : 사용자, 암호를 확인하세요" };
         }
     }
     catch (ex) {
-        return { status: "fail", message: "로그인 실패 : " + ex };
+        return { status: "fail", code: 500, message: "로그인 실패 : " + ex };
     }
 };
 exports.findUser = findUser;
@@ -59,15 +59,15 @@ const createUser = ({ userid, password, username, role = "users" }) => {
     try {
         let doc = users.findOne({ userid });
         if (doc)
-            throw new Error("이미 존재하는 사용자입니다.");
+            return { status: "fail", code: 409, message: "사용자 등록 실패 : 이미 존재하는 사용자입니다." };
         users.insert({ userid, password, username, role });
         //샘플 데이터
         todoList.insert({ userid, id: new Date().getTime(), todo: "ES6공부를 해야 합니다", desc: "리액트 학습을 위해 ES6를 익혀야 합니다." });
         todoList.insert({ userid, id: new Date().getTime() + 1, todo: "리액트 학습", desc: "리액트 학습을 해야 합니다" });
-        return { status: "success", message: "사용자 등록 성공!" };
+        return { status: "success", code: 201, message: "사용자 등록 성공!" };
     }
     catch (ex) {
-        return { status: "fail", message: "사용자 등록 실패 : " + ex.message };
+        return { status: "fail", code: 500, message: "사용자 등록 실패 : " + ex.message };
     }
 };
 exports.createUser = createUser;
@@ -84,21 +84,21 @@ const getTodoList = ({ userid }) => {
         return { status: "success", todoList: result };
     }
     catch (ex) {
-        return { status: "fail", message: "조회 실패 : " + ex };
+        return { status: "fail", code: 500, message: "조회 실패 : " + ex };
     }
 };
 exports.getTodoList = getTodoList;
 const addTodo = ({ userid, todo, desc }) => {
     try {
-        if (todo === null || todo.trim() === "") {
-            throw new Error("할일을 입력하셔야 합니다.");
+        if (typeof todo !== "string" || todo.trim() === "") {
+            return { status: "fail", code: 400, message: "추가 실패 : 할일을 입력하셔야 합니다." };
         }
         let item = { userid, id: new Date().getTime(), todo, desc };
         todoList.insert(item);
-        return { status: "success", message: "추가 성공", item: { id: item.id, todo: item.todo, desc: item.desc } };
+        return { status: "success", code: 201, message: "추가 성공", item: { id: item.id, todo: item.todo, desc: item.desc } };
     }
     catch (ex) {
-        return { status: "fail", message: "추가 실패 : " + ex };
+        return { status: "fail", code: 500, message: "추가 실패 : " + ex };
     }
 };
 exports.addTodo = addTodo;
@@ -110,11 +110,11 @@ const deleteTodo = ({ userid, id }) => {
             return { status: "success", message: "삭제 성공", item: { id: one.id, todo: one.todo, desc: one.desc } };
         }
         else {
-            return { status: "fail", message: "삭제 실패 : 삭제하려는 데이터가 존재하지 않음" };
+            return { status: "fail", code: 404, message: "삭제 실패 : 삭제하려는 데이터가 존재하지 않음" };
         }
     }
     catch (ex) {
-        return { status: "fail", message: "삭제 실패 : " + ex };
+        return { status: "fail", code: 500, message: "삭제 실패 : " + ex };
     }
 };
 exports.deleteTodo = deleteTodo;

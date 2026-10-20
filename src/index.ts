@@ -69,6 +69,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     return;
   }
   //console.log("## JWT Middleware!! : " + req.path)
+  //인증 실패는 모두 401 + WWW-Authenticate 헤더로 응답한다 (RFC 6750)
+  const unauthorized = (body: unknown, error = "invalid_token") => {
+    res.status(401).set('WWW-Authenticate', `Bearer realm="todosvc", error="${error}"`).json(body);
+  }
   let auth_header = req.headers.authorization;
   if (auth_header) {
       let [name, token] = auth_header.split(" ")
@@ -78,14 +82,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
             req.users = jwtresult.users;
             next()
           } else {
-            res.json(jwtresult);
+            unauthorized(jwtresult);
           }
         }})
       } else {
-        res.json({ status: "fail", message: "토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." })
+        unauthorized({ status: "fail", message: "토큰의 형식이 올바르지 않습니다. Bearer Token 형식을 사용합니다." }, "invalid_request")
       }
   } else {
-      res.json({ status: "fail", message: "authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." })
+      unauthorized({ status: "fail", message: "authorization 요청 헤더를 통해 토큰이 전달되지 않았습니다." }, "invalid_request")
   }
 
 });

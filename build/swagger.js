@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swaggerSpec = void 0;
+const apiResult = (description) => ({
+    description,
+    content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
+});
+const unauthorized = apiResult('인증 실패 (토큰 누락, 형식 오류, 만료, 위조, refresh_token 사용)');
 exports.swaggerSpec = {
     openapi: '3.0.3',
     info: {
@@ -58,10 +63,10 @@ exports.swaggerSpec = {
                     },
                 },
                 responses: {
-                    200: {
-                        description: '등록 결과',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
-                    },
+                    201: apiResult('등록 성공'),
+                    400: apiResult('필수 항목(userid, password, username) 누락'),
+                    409: apiResult('이미 존재하는 사용자'),
+                    500: apiResult('내부 서버 오류'),
                 },
             },
         },
@@ -85,10 +90,10 @@ exports.swaggerSpec = {
                     },
                 },
                 responses: {
-                    200: {
-                        description: '로그인 결과 (access_token, refresh_token 포함)',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
-                    },
+                    200: apiResult('로그인 성공 (access_token, refresh_token 포함)'),
+                    400: apiResult('필수 항목(userid, password) 누락'),
+                    401: apiResult('사용자 또는 암호 불일치'),
+                    500: apiResult('내부 서버 오류'),
                 },
             },
         },
@@ -110,10 +115,9 @@ exports.swaggerSpec = {
                     },
                 },
                 responses: {
-                    200: {
-                        description: '갱신 결과 (access_token, refresh_token 포함)',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
-                    },
+                    200: apiResult('갱신 성공 (access_token, refresh_token 포함)'),
+                    400: apiResult('refresh_token 누락'),
+                    401: apiResult('유효하지 않거나 만료된 refresh_token'),
                 },
             },
         },
@@ -137,6 +141,8 @@ exports.swaggerSpec = {
                             },
                         },
                     },
+                    401: unauthorized,
+                    500: apiResult('내부 서버 오류'),
                 },
             },
             post: {
@@ -159,10 +165,10 @@ exports.swaggerSpec = {
                     },
                 },
                 responses: {
-                    200: {
-                        description: '추가 결과',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
-                    },
+                    201: apiResult('추가 성공'),
+                    400: apiResult('할일(todo) 누락'),
+                    401: unauthorized,
+                    500: apiResult('내부 서버 오류'),
                 },
             },
         },
@@ -180,10 +186,11 @@ exports.swaggerSpec = {
                     },
                 ],
                 responses: {
-                    200: {
-                        description: '삭제 결과',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiResult' } } },
-                    },
+                    200: apiResult('삭제 성공'),
+                    400: apiResult('id가 정수가 아님'),
+                    401: unauthorized,
+                    404: apiResult('삭제하려는 데이터가 존재하지 않음'),
+                    500: apiResult('내부 서버 오류'),
                 },
             },
         },

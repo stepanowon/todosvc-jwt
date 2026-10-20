@@ -14,9 +14,10 @@ export interface UserRecord {
   role: string;
 }
 
+// code: 응답에 사용할 HTTP Status Code (응답 body에는 포함하지 않는다)
 export type ApiResult =
-  | { status: 'success'; message?: string; [key: string]: unknown }
-  | { status: 'fail'; message: string };
+  | { status: 'success'; code?: number; message?: string; [key: string]: unknown }
+  | { status: 'fail'; code?: number; message: string };
 
 export interface AccessTokenPayload extends JWTPayload {
   userid: string;
