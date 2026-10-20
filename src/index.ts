@@ -1,3 +1,5 @@
+// .env 로드를 위해 다른 모듈보다 먼저 import 한다
+import './config';
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';

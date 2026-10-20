@@ -1,12 +1,10 @@
 import type { SignJWT as SignJWTType, jwtVerify as jwtVerifyType } from 'jose';
 import { createHash } from 'crypto';
 import type { JwtCheckResult, RefreshTokenPayload } from './types';
+import { jwtConfig } from './config';
 
-let secretKey = "mysecretkey";
-if (process.env.JWT_SECRET_KEY) {
-    secretKey = process.env.JWT_SECRET_KEY;
-}
-const secret = new TextEncoder().encode(secretKey);
+const secret = new TextEncoder().encode(jwtConfig.secretKey);
+const { algorithm, issuer } = jwtConfig;
 
 type JoseModule = { SignJWT: typeof SignJWTType; jwtVerify: typeof jwtVerifyType };
 
@@ -24,24 +22,24 @@ const importJose = (): Promise<JoseModule> => {
 
 export const createToken = async ({ userid, role }: { userid: string; role: string }): Promise<string> => {
     const { SignJWT } = await importJose();
-    return new SignJWT({ userid, role, iss: "jwt test server" })
-        .setProtectedHeader({ alg: "HS512", typ: "JWT" })
+    return new SignJWT({ userid, role, iss: issuer })
+        .setProtectedHeader({ alg: algorithm, typ: "JWT" })
         .setIssuedAt()
-        .setExpirationTime("1h")
+        .setExpirationTime(jwtConfig.accessTokenExpiresIn)
         .sign(secret);
 }
 
 export const createRefreshToken = async ({ userid, role, type }: { userid: string; role: string; type: string }): Promise<string> => {
     const { SignJWT } = await importJose();
-    return new SignJWT({ userid, role, type, iss: "jwt test server" })
-        .setProtectedHeader({ alg: "HS512", typ: "JWT" })
+    return new SignJWT({ userid, role, type, iss: issuer })
+        .setProtectedHeader({ alg: algorithm, typ: "JWT" })
         .setIssuedAt()
-        .setExpirationTime("7d")
+        .setExpirationTime(jwtConfig.refreshTokenExpiresIn)
         .sign(secret);
 }
 
 export const checkToken = ({ token, callback }: { token: string; callback: (result: JwtCheckResult) => void }): void => {
-    importJose().then(({ jwtVerify }) => jwtVerify(token, secret, { algorithms: ['HS512'] })).then(({ payload }) => {
+    importJose().then(({ jwtVerify }) => jwtVerify(token, secret, { algorithms: [algorithm] })).then(({ payload }) => {
         const users = payload as RefreshTokenPayload;
         if (users.type === "refresh_token") {
             callback({ status: "fail", message: "use your valid access_token" });
@@ -54,7 +52,7 @@ export const checkToken = ({ token, callback }: { token: string; callback: (resu
 }
 
 export const checkRefreshToken = ({ refresh_token, callback }: { refresh_token: string; callback: (result: JwtCheckResult) => void }): void => {
-    importJose().then(({ jwtVerify }) => jwtVerify(refresh_token, secret, { algorithms: ['HS512'] })).then(({ payload }) => {
+    importJose().then(({ jwtVerify }) => jwtVerify(refresh_token, secret, { algorithms: [algorithm] })).then(({ payload }) => {
         const users = payload as RefreshTokenPayload;
         //access_token으로 토큰을 재발급받지 못하도록 refresh_token인지 확인한다
         if (users.type !== "refresh_token") {

@@ -23,6 +23,7 @@ Express 기반으로 사용자 등록/로그인/JWT 인증(Access + Refresh Toke
 todosvc-jwt/
 ├── src/
 │   ├── index.ts       # 서버 설정, 미들웨어, JWT 인증 검사
+│   ├── config.ts      # 환경변수(.env) 로드, JWT 설정
 │   ├── routes.ts       # API 라우트
 │   ├── authutil.ts     # JWT 발급/검증, 비밀번호 해시
 │   ├── tododao.ts      # LokiJS 데이터 접근 계층
@@ -32,6 +33,7 @@ todosvc-jwt/
 ├── public/              # 정적 파일
 ├── log/                 # 접근 로그 (자동 생성)
 ├── build/               # 빌드 결과물 (tsc 컴파일)
+├── .env.example         # 환경변수 예시
 └── tsconfig.json
 ```
 
@@ -51,6 +53,25 @@ npm start
 ```
 
 기본 포트는 `3000`이며 `PORT` 환경 변수로 변경할 수 있습니다.
+
+## 환경변수
+
+`.env.example`을 `.env`로 복사해 값을 설정하면 서버 시작 시 자동으로 로드됩니다. (`.env`는 git에 커밋되지 않습니다.) Vercel 등 배포 환경에서는 플랫폼의 환경변수 설정을 사용합니다.
+
+```bash
+cp .env.example .env
+```
+
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `PORT` | `3000` | 서버 포트 |
+| `JWT_SECRET_KEY` | `mysecretkey` (개발용) | JWT 서명 비밀키. 운영 환경에서는 반드시 설정 |
+| `JWT_ALGORITHM` | `HS512` | 서명 알고리즘 (`HS256`, `HS384`, `HS512`) |
+| `JWT_ISSUER` | `jwt test server` | 토큰 발급자(`iss`) |
+| `JWT_ACCESS_TOKEN_EXPIRES_IN` | `1h` | Access Token 만료 시간 (`30m`, `1h`, `7d` 등 또는 초 단위 숫자) |
+| `JWT_REFRESH_TOKEN_EXPIRES_IN` | `7d` | Refresh Token 만료 시간 |
+
+`JWT_SECRET_KEY`가 없으면 시작 시 경고를 출력하고, `JWT_ALGORITHM`이 허용되지 않은 값이면 서버가 시작되지 않습니다.
 
 ## API
 
@@ -97,13 +118,13 @@ npm start
 
 ## 인증 방식
 
-- 서명 알고리즘: **HS512**
-- Access Token: 1시간 만료
-- Refresh Token: 7일 만료, HTTP-only 쿠키 또는 요청 body로 전달 가능
+- 서명 알고리즘: **HS512** (`JWT_ALGORITHM`으로 변경)
+- Access Token: 1시간 만료 (`JWT_ACCESS_TOKEN_EXPIRES_IN`으로 변경)
+- Refresh Token: 7일 만료 (`JWT_REFRESH_TOKEN_EXPIRES_IN`으로 변경), HTTP-only 쿠키 또는 요청 body로 전달 가능
 - `/token`은 refresh_token만 허용하며, access_token으로는 토큰을 재발급할 수 없습니다
 - 비밀번호는 SHA-256 HMAC으로 해시하여 저장
 
-`JWT_SECRET_KEY` 환경 변수로 서명 키를 지정합니다. 지정하지 않으면 개발용 기본값을 사용하므로 운영 환경에서는 반드시 설정해야 합니다.
+서명 키는 `JWT_SECRET_KEY` 환경변수로 지정합니다. 지정하지 않으면 개발용 기본값을 사용하므로 운영 환경에서는 반드시 설정해야 합니다.
 
 ## 기본 계정 (샘플 데이터)
 
