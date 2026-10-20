@@ -52,7 +52,14 @@ const checkToken = ({ token, callback }) => {
 exports.checkToken = checkToken;
 const checkRefreshToken = ({ refresh_token, callback }) => {
     importJose().then(({ jwtVerify }) => jwtVerify(refresh_token, secret, { algorithms: ['HS512'] })).then(({ payload }) => {
-        callback({ status: "success", users: payload });
+        const users = payload;
+        //access_token으로 토큰을 재발급받지 못하도록 refresh_token인지 확인한다
+        if (users.type !== "refresh_token") {
+            callback({ status: "fail", message: "use your valid refresh_token" });
+        }
+        else {
+            callback({ status: "success", users });
+        }
     }).catch((err) => {
         callback({ status: "fail", message: err.code === "ERR_JWT_EXPIRED" ? "expired token" : err });
     });

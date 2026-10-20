@@ -68,9 +68,9 @@ export default (app: Express) => {
         } else {
             checkRefreshToken({ refresh_token, callback: async (jwtresult) => {
                 if (jwtresult.status === "success") {
-                    let { userid, role, type } = jwtresult.users;
+                    let { userid, role } = jwtresult.users;
                     let access_token = await createToken({ userid, role })
-                    let refresh_token = await createRefreshToken({ userid, type: type as string, role })
+                    let refresh_token = await createRefreshToken({ userid, type: "refresh_token", role })
                     return res.json({ status: "success", message: "토큰 갱신 성공", access_token, refresh_token })
                 } else {
                     return res.status(401).json(jwtresult);
